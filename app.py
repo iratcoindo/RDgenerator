@@ -17,16 +17,17 @@ from community import community_louvain
 # ==================================
 
 st.set_page_config(
-    page_title="iRATco Research Design Generator",
-    page_icon="📚",
+    page_title="iRATco SLR Dashboard",
+    page_icon="logo.png",
     layout="wide"
 )
 
-st.title("📚 iRATco Research Design Generator")
-
-st.write(
-    "Literature Review + Research Design Recommendation"
-)
+# HEADER
+col1, col2 = st.columns([8,2])
+with col1:
+    st.title("📊 iRATco LSR Dashboard")
+with col2:
+    st.image("logo_iratco.png", width=250)
 
 # ==================================
 # INPUT
