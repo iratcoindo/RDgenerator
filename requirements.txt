@@ -1,0 +1,9 @@
+streamlit
+requests
+pandas
+numpy
+networkx
+matplotlib
+plotly
+wordcloud
+python-louvain
