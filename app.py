@@ -607,7 +607,13 @@ st.subheader(
 )
 
 pathway_nodes = []
+query = " ".join([
+    keyword1,
+    keyword2,
+    keyword3
+]).strip()
 
+query_lower = query.lower()
 query_lower = query.lower()
 
 if "fibroblast" in query_lower:
