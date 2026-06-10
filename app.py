@@ -653,19 +653,19 @@ else:
 
     if "freq" in locals():
 
-    top_terms = [
-        w
-        for w,c
-        in freq.most_common(6)
-    ]
-
-else:
-
-    top_terms = [
-        keyword1,
-        keyword2,
-        keyword3
-    ]
+        top_terms = [
+            w
+            for w,c
+            in freq.most_common(6)
+        ]
+    
+    else:
+    
+        top_terms = [
+            keyword1,
+            keyword2,
+            keyword3
+        ]
 
     pathway_nodes = top_terms
 
