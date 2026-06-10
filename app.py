@@ -490,6 +490,102 @@ if st.button("Search Literature"):
             f"• {word}"
         )
 
+    species_db = [
+        "mouse",
+        "mice",
+        "rat",
+        "rabbit",
+        "dog",
+        "cat",
+        "cow",
+        "pig",
+        "horse",
+        "human",
+        "rhinoceros",
+        "rhino",
+        "elephant",
+        "tiger"
+    ]
+    marker_db = [
+        "vimentin",
+        "fibronectin",
+        "col1a1",
+        "col3a1",
+        "ki67",
+        "pcna",
+        "sox2",
+        "oct4",
+        "nanog",
+        "cd73",
+        "cd90",
+        "cd105",
+        "bax",
+        "bcl2",
+        "caspase",
+        "tp53"
+    ]
+    analysis_db = [
+        "qpcr",
+        "rt-pcr",
+        "rna-seq",
+        "western blot",
+        "immunohistochemistry",
+        "immunocytochemistry",
+        "flow cytometry",
+        "elisa",
+        "transcriptome"
+    ]
+    sample_db = [
+        "blood",
+        "serum",
+        "plasma",
+        "skin",
+        "ear",
+        "biopsy",
+        "fibroblast",
+        "bone marrow",
+        "adipose"
+    ]
+    species_count = {}
+
+    for s in species_db:
+    
+        species_count[s] = combined_lower.count(s)
+    
+    species_df = pd.DataFrame({
+    
+        "Species":species_count.keys(),
+        "Count":species_count.values()
+    
+    })
+    
+    species_df = species_df.sort_values(
+        "Count",
+        ascending=False
+    )
+
+    marker_count = {}
+
+    for m in marker_db:
+    
+        marker_count[m] = combined_lower.count(m)
+    
+    marker_df = pd.DataFrame({
+    
+        "Marker":marker_count.keys(),
+        "Count":marker_count.values()
+    
+    })
+    
+    marker_df = marker_df.sort_values(
+        "Count",
+        ascending=False
+    )
+    analysis_count = {}
+
+    for a in analysis_db:
+    
+        analysis_count[a] = combined_lower.count(a)
     # ===============================
     # RESEARCH DESIGN
     # ===============================
