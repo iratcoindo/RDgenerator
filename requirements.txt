@@ -7,3 +7,4 @@ matplotlib
 plotly
 wordcloud
 python-louvain
+scikit-learn
