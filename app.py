@@ -315,7 +315,68 @@ if st.button("Search Literature"):
     freq = Counter(
         keywords
     )
+    # ==================================
+    # TERM MINING
+    # ==================================
+    
+    term_df = pd.DataFrame({
+    
+        "Term": list(freq.keys()),
+        "Count": list(freq.values())
+    
+    })
+    
+    term_df = term_df.sort_values(
+        "Count",
+        ascending=False
+    )
+    
+    st.subheader(
+        "Most Frequent Terms"
+    )
+    
+    st.dataframe(
+        term_df.head(50)
+    )
 
+    from sklearn.feature_extraction.text import CountVectorizer
+
+    vectorizer = CountVectorizer(
+    
+        ngram_range=(2,3),
+    
+        stop_words="english",
+    
+        min_df=2
+    
+    )
+    
+    X = vectorizer.fit_transform(
+        all_abstracts
+    )
+    
+    phrase_counts = pd.DataFrame({
+    
+        "Phrase":
+        vectorizer.get_feature_names_out(),
+    
+        "Count":
+        X.toarray().sum(axis=0)
+    
+    })
+    
+    phrase_counts = phrase_counts.sort_values(
+        "Count",
+        ascending=False
+    )
+    
+    st.subheader(
+        "Top Scientific Phrases"
+    )
+    
+    st.dataframe(
+        phrase_counts.head(30)
+    )
     # ===============================
     # WORD CLOUD
     # ===============================
@@ -500,98 +561,6 @@ if st.button("Search Literature"):
     )
     
     combined_lower = combined.lower()
-    
-    species_db = [
-        "mouse","mice","rat","rabbit",
-        "dog","cat","cow","cattle",
-        "horse","pig","human",
-        "rhinoceros","rhino",
-        "elephant","tiger",
-        "buffalo","goat","sheep"
-    ]
-    
-    marker_db = [
-    
-        "vimentin",
-        "fibronectin",
-        "col1a1",
-        "col3a1",
-        "ki67",
-        "pcna",
-        "oct4",
-        "sox2",
-        "nanog",
-        "klf4",
-        "cd73",
-        "cd90",
-        "cd105",
-        "bax",
-        "bcl2",
-        "caspase",
-        "tp53",
-        "myod",
-        "myogenin"
-    
-    ]
-    
-    analysis_db = [
-    
-        "qpcr",
-        "rt-pcr",
-        "rt qpcr",
-        "rna-seq",
-        "western blot",
-        "immunohistochemistry",
-        "immunocytochemistry",
-        "flow cytometry",
-        "elisa",
-        "transcriptome",
-        "sequencing"
-    
-    ]
-    
-    sample_db = [
-    
-        "blood",
-        "serum",
-        "plasma",
-        "skin",
-        "ear",
-        "biopsy",
-        "fibroblast",
-        "bone marrow",
-        "adipose",
-        "tissue"
-    
-    ]
-    
-    def mine_terms(database):
-    
-        counts = {}
-    
-        for item in database:
-    
-            counts[item] = combined_lower.count(item)
-    
-        df_tmp = pd.DataFrame({
-            "Term": counts.keys(),
-            "Count": counts.values()
-        })
-    
-        df_tmp = (
-            df_tmp[df_tmp["Count"] > 0]
-            .sort_values(
-                "Count",
-                ascending=False
-            )
-        )
-    
-        return df_tmp
-    
-    species_df = mine_terms(species_db)
-    marker_df = mine_terms(marker_db)
-    analysis_df = mine_terms(analysis_db)
-    sample_df = mine_terms(sample_db)
 
     col1,col2 = st.columns(2)
 
@@ -630,55 +599,4 @@ if st.button("Search Literature"):
     st.dataframe(
         sample_df.head(10)
     )
-    # ===============================
-    # RESEARCH DESIGN
-    # ===============================
-
-    st.subheader(
-        "Research Design Recommendation"
-    )
     
-    top_species = species_df.head(5)
-    top_marker = marker_df.head(10)
-    top_analysis = analysis_df.head(10)
-    top_sample = sample_df.head(10)
-    
-    st.markdown(
-        "### Recommended Species"
-    )
-    
-    for s in top_species["Term"]:
-    
-        st.write(
-            f"• {s}"
-        )
-    
-    st.markdown(
-        "### Recommended Sampling"
-    )
-    
-    for s in top_sample["Term"]:
-    
-        st.write(
-            f"• {s}"
-        )
-    
-    st.markdown(
-        "### Recommended Biomarkers"
-    )
-    
-    for s in top_marker["Term"]:
-    
-        st.write(
-            f"• {s}"
-        )
-    
-    st.markdown(
-        "### Recommended Analytical Methods"
-    )
-    
-    for s in top_analysis["Term"]:
-    
-        st.write(
-            f"• {s}"
-        )
