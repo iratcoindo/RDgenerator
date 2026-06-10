@@ -490,52 +490,67 @@ if st.button("Search Literature"):
             f"• {word}"
         )
 
+    # ==========================================
+    # LITERATURE MINING
+    # ==========================================
+    
+    st.subheader(
+        "Literature-derived Research Components"
+    )
+    
+    combined_lower = combined.lower()
+    
     species_db = [
-        "mouse",
-        "mice",
-        "rat",
-        "rabbit",
-        "dog",
-        "cat",
-        "cow",
-        "pig",
-        "horse",
-        "human",
-        "rhinoceros",
-        "rhino",
-        "elephant",
-        "tiger"
+        "mouse","mice","rat","rabbit",
+        "dog","cat","cow","cattle",
+        "horse","pig","human",
+        "rhinoceros","rhino",
+        "elephant","tiger",
+        "buffalo","goat","sheep"
     ]
+    
     marker_db = [
+    
         "vimentin",
         "fibronectin",
         "col1a1",
         "col3a1",
         "ki67",
         "pcna",
-        "sox2",
         "oct4",
+        "sox2",
         "nanog",
+        "klf4",
         "cd73",
         "cd90",
         "cd105",
         "bax",
         "bcl2",
         "caspase",
-        "tp53"
+        "tp53",
+        "myod",
+        "myogenin"
+    
     ]
+    
     analysis_db = [
+    
         "qpcr",
         "rt-pcr",
+        "rt qpcr",
         "rna-seq",
         "western blot",
         "immunohistochemistry",
         "immunocytochemistry",
         "flow cytometry",
         "elisa",
-        "transcriptome"
+        "transcriptome",
+        "sequencing"
+    
     ]
+    
     sample_db = [
+    
         "blood",
         "serum",
         "plasma",
@@ -544,48 +559,76 @@ if st.button("Search Literature"):
         "biopsy",
         "fibroblast",
         "bone marrow",
-        "adipose"
+        "adipose",
+        "tissue"
+    
     ]
-    species_count = {}
+    
+    def mine_terms(database):
+    
+        counts = {}
+    
+        for item in database:
+    
+            counts[item] = combined_lower.count(item)
+    
+        df_tmp = pd.DataFrame({
+            "Term": counts.keys(),
+            "Count": counts.values()
+        })
+    
+        df_tmp = (
+            df_tmp[df_tmp["Count"] > 0]
+            .sort_values(
+                "Count",
+                ascending=False
+            )
+        )
+    
+        return df_tmp
+    
+    species_df = mine_terms(species_db)
+    marker_df = mine_terms(marker_db)
+    analysis_df = mine_terms(analysis_db)
+    sample_df = mine_terms(sample_db)
 
-    for s in species_db:
+    col1,col2 = st.columns(2)
+
+    with col1:
     
-        species_count[s] = combined_lower.count(s)
+        st.markdown(
+            "### Species Most Frequently Used"
+        )
     
-    species_df = pd.DataFrame({
+        st.dataframe(
+            species_df.head(10)
+        )
     
-        "Species":species_count.keys(),
-        "Count":species_count.values()
+    with col2:
     
-    })
+        st.markdown(
+            "### Biomarkers Most Frequently Used"
+        )
     
-    species_df = species_df.sort_values(
-        "Count",
-        ascending=False
+        st.dataframe(
+            marker_df.head(10)
+        )
+    
+    st.markdown(
+        "### Analytical Methods"
     )
-
-    marker_count = {}
-
-    for m in marker_db:
     
-        marker_count[m] = combined_lower.count(m)
-    
-    marker_df = pd.DataFrame({
-    
-        "Marker":marker_count.keys(),
-        "Count":marker_count.values()
-    
-    })
-    
-    marker_df = marker_df.sort_values(
-        "Count",
-        ascending=False
+    st.dataframe(
+        analysis_df.head(10)
     )
-    analysis_count = {}
-
-    for a in analysis_db:
     
-        analysis_count[a] = combined_lower.count(a)
+    st.markdown(
+        "### Sampling Types"
+    )
+    
+    st.dataframe(
+        sample_df.head(10)
+    )
     # ===============================
     # RESEARCH DESIGN
     # ===============================
@@ -593,236 +636,48 @@ if st.button("Search Literature"):
     st.subheader(
         "Research Design Recommendation"
     )
-
-    st.markdown(
-        "### Research Question"
-    )
-
-    st.info(
-        f"How does {query} affect biological processes and outcomes?"
-    )
-
-    st.markdown(
-        "### Hypothesis"
-    )
-
-    st.info(
-        f"{query} significantly influences cellular and molecular responses."
-    )
-
-    st.markdown(
-        "### Suggested Species"
-    )
-
-    st.write(
-        """
-• Mouse
-
-• Rat
-
-• Rabbit
-
-• Wildlife species
-"""
-    )
-
-    st.markdown(
-        "### Suggested Sampling"
-    )
-
-    st.write(
-        """
-• Blood
-
-• Tissue biopsy
-
-• Cell culture
-
-• Fibroblast sample
-"""
-    )
-
-    st.markdown(
-        "### Suggested Biomarkers"
-    )
-
-    st.write(
-        """
-• Ki67
-
-• PCNA
-
-• Vimentin
-
-• Fibronectin
-
-• COL1A1
-"""
-    )
-
-    st.markdown(
-        "### Suggested Analyses"
-    )
-
-    st.write(
-        """
-• Histopathology
-
-• Immunohistochemistry
-
-• RT-qPCR
-
-• RNA-seq
-
-• Flow Cytometry
-"""
-    )
-
-    st.markdown(
-        "### Suggested Statistics"
-    )
-
-    st.write(
-        """
-• ANOVA
-
-• T-test
-
-• PCA
-
-• Correlation Analysis
-"""
-    )
-
-# ==================================
-# HYPOTHESIS PATHWAY
-# ==================================
-
-st.subheader(
-    "Hypothesis Pathway"
-)
-
-pathway_nodes = []
-query = " ".join([
-    keyword1,
-    keyword2,
-    keyword3
-]).strip()
-
-query_lower = query.lower()
-query_lower = query.lower()
-
-if "fibroblast" in query_lower:
-
-    pathway_nodes.extend([
-        "Skin Biopsy",
-        "Fibroblast Isolation",
-        "Cell Expansion",
-        "Cryopreservation",
-        "Cell Viability",
-        "Gene Expression",
-        "Conservation Outcome"
-    ])
-
-elif "stem" in query_lower:
-
-    pathway_nodes.extend([
-        "Stem Cell",
-        "Differentiation",
-        "Marker Expression",
-        "Tissue Regeneration",
-        "Biological Outcome"
-    ])
-
-elif "ipsc" in query_lower:
-
-    pathway_nodes.extend([
-        "Fibroblast",
-        "Reprogramming",
-        "iPSC",
-        "Differentiation",
-        "Functional Cells",
-        "Conservation Application"
-    ])
-
-else:
-
-    if "freq" in locals():
-
-        top_terms = [
-            w
-            for w,c
-            in freq.most_common(6)
-        ]
     
-    else:
+    top_species = species_df.head(5)
+    top_marker = marker_df.head(10)
+    top_analysis = analysis_df.head(10)
+    top_sample = sample_df.head(10)
     
-        top_terms = [
-            keyword1,
-            keyword2,
-            keyword3
-        ]
-
-    pathway_nodes = top_terms
-
-G_path = nx.DiGraph()
-
-for i in range(
-    len(pathway_nodes)-1
-):
-
-    G_path.add_edge(
-        pathway_nodes[i],
-        pathway_nodes[i+1]
+    st.markdown(
+        "### Recommended Species"
     )
-
-fig, ax = plt.subplots(
-    figsize=(12,4)
-)
-
-pos = {}
-
-for i,node in enumerate(
-    pathway_nodes
-):
-
-    pos[node] = (i,0)
-
-nx.draw_networkx_nodes(
-    G_path,
-    pos,
-    node_size=4000,
-    node_color="lightblue",
-    alpha=0.9
-)
-
-nx.draw_networkx_edges(
-    G_path,
-    pos,
-    arrows=True,
-    arrowsize=25,
-    width=3
-)
-
-nx.draw_networkx_labels(
-    G_path,
-    pos,
-    font_size=10,
-    font_weight="bold"
-)
-
-ax.axis("off")
-
-st.pyplot(fig)
-
-st.subheader(
-    "Mechanistic Hypothesis"
-)
-
-hypothesis_text = " → ".join(
-    pathway_nodes
-)
-
-st.success(
-    hypothesis_text
-)
+    
+    for s in top_species["Term"]:
+    
+        st.write(
+            f"• {s}"
+        )
+    
+    st.markdown(
+        "### Recommended Sampling"
+    )
+    
+    for s in top_sample["Term"]:
+    
+        st.write(
+            f"• {s}"
+        )
+    
+    st.markdown(
+        "### Recommended Biomarkers"
+    )
+    
+    for s in top_marker["Term"]:
+    
+        st.write(
+            f"• {s}"
+        )
+    
+    st.markdown(
+        "### Recommended Analytical Methods"
+    )
+    
+    for s in top_analysis["Term"]:
+    
+        st.write(
+            f"• {s}"
+        )
