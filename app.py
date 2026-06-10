@@ -597,3 +597,120 @@ if st.button("Search Literature"):
 • Correlation Analysis
 """
     )
+
+# ==================================
+# HYPOTHESIS PATHWAY
+# ==================================
+
+st.subheader(
+    "Hypothesis Pathway"
+)
+
+pathway_nodes = []
+
+query_lower = query.lower()
+
+if "fibroblast" in query_lower:
+
+    pathway_nodes.extend([
+        "Skin Biopsy",
+        "Fibroblast Isolation",
+        "Cell Expansion",
+        "Cryopreservation",
+        "Cell Viability",
+        "Gene Expression",
+        "Conservation Outcome"
+    ])
+
+elif "stem" in query_lower:
+
+    pathway_nodes.extend([
+        "Stem Cell",
+        "Differentiation",
+        "Marker Expression",
+        "Tissue Regeneration",
+        "Biological Outcome"
+    ])
+
+elif "ipsc" in query_lower:
+
+    pathway_nodes.extend([
+        "Fibroblast",
+        "Reprogramming",
+        "iPSC",
+        "Differentiation",
+        "Functional Cells",
+        "Conservation Application"
+    ])
+
+else:
+
+    top_terms = [
+        w
+        for w,c
+        in freq.most_common(6)
+    ]
+
+    pathway_nodes = top_terms
+
+G_path = nx.DiGraph()
+
+for i in range(
+    len(pathway_nodes)-1
+):
+
+    G_path.add_edge(
+        pathway_nodes[i],
+        pathway_nodes[i+1]
+    )
+
+fig, ax = plt.subplots(
+    figsize=(12,4)
+)
+
+pos = {}
+
+for i,node in enumerate(
+    pathway_nodes
+):
+
+    pos[node] = (i,0)
+
+nx.draw_networkx_nodes(
+    G_path,
+    pos,
+    node_size=4000,
+    node_color="lightblue",
+    alpha=0.9
+)
+
+nx.draw_networkx_edges(
+    G_path,
+    pos,
+    arrows=True,
+    arrowsize=25,
+    width=3
+)
+
+nx.draw_networkx_labels(
+    G_path,
+    pos,
+    font_size=10,
+    font_weight="bold"
+)
+
+ax.axis("off")
+
+st.pyplot(fig)
+
+st.subheader(
+    "Mechanistic Hypothesis"
+)
+
+hypothesis_text = " → ".join(
+    pathway_nodes
+)
+
+st.success(
+    hypothesis_text
+)
