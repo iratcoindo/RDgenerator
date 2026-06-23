@@ -219,12 +219,9 @@ if st.button("🔍 Search Papers"):
                 
                     except Exception as e:
                         st.error(e)
-
                 if "paper_text" in st.session_state:
 
-                    text = st.session_state[
-                        "paper_text"
-                    ]
+                    text = st.session_state["paper_text"]
                 
                     lower = text.lower()
                 
@@ -238,7 +235,7 @@ if st.button("🔍 Search Papers"):
                     ]
                 
                     start = -1
-            
+                
                     for h in headers:
                 
                         pos = lower.find(h)
@@ -246,54 +243,43 @@ if st.button("🔍 Search Papers"):
                         if pos != -1:
                             start = pos
                             break
-            
-                if start != -1:
-            
-                    end = len(text)
-            
-                    next_headers = [
-                        "results",
-                        "discussion",
-                        "conclusion",
-                        "references"
-                    ]
-            
-                    for h in next_headers:
-            
-                        pos = lower.find(
-                            h,
-                            start + 100
+                
+                    if start != -1:
+                
+                        end = len(text)
+                
+                        next_headers = [
+                            "results",
+                            "discussion",
+                            "conclusion",
+                            "references"
+                        ]
+                
+                        for h in next_headers:
+                
+                            pos = lower.find(
+                                h,
+                                start + 100
+                            )
+                
+                            if pos != -1 and pos < end:
+                                end = pos
+                
+                        methods_text = text[start:end]
+                
+                        st.subheader(
+                            "Methods Section"
                         )
-            
-                        if (
-                            pos != -1
-                            and
-                            pos < end
-                        ):
-                            end = pos
-            
-                    methods_text = text[
-                        start:end
-                    ]
-            
-                    st.subheader(
-                        "Methods Section"
-                    )
-            
-                    st.text_area(
-                        "",
-                        methods_text,
-                        height=500
-                    )
-            
-                    st.session_state[
-                        "methods_text"
-                    ] = methods_text
-                if "methods_text" in st.session_state:
-
-                    methods = st.session_state[
-                        "methods_text"
-                    ]
+                
+                        st.text_area(
+                            "",
+                            methods_text,
+                            height=500
+                        )
+                
+                        st.session_state[
+                            "methods_text"
+                        ] = methods_text
                 
                     info = []
                 
