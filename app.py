@@ -26,15 +26,13 @@ if st.button("🔍 Search Papers"):
         if k.strip()
     ]
 
-    query = " ".join(keywords)
-
     if len(keywords) == 0:
-        st.warning("Please enter at least one keyword.")
+        st.warning(
+            "Please enter keywords."
+        )
         st.stop()
 
     all_papers = []
-
-    progress = st.progress(0)
 
     query = " ".join(keywords)
 
@@ -43,10 +41,13 @@ if st.button("🔍 Search Papers"):
         f"?search={query}"
         "&per-page=200"
     )
-    
-    r = requests.get(url, timeout=30)
-    data = r.json()
 
+    r = requests.get(
+        url,
+        timeout=30
+    )
+
+    data = r.json()
     try:
         r = requests.get(url, timeout=30)
         data = r.json()
