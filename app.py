@@ -239,13 +239,13 @@ if st.button("🔍 Search Papers"):
                 
                     start = -1
             
-                for h in headers:
-            
-                    pos = lower.find(h)
-            
-                    if pos != -1:
-                        start = pos
-                        break
+                    for h in headers:
+                
+                        pos = lower.find(h)
+                
+                        if pos != -1:
+                            start = pos
+                            break
             
                 if start != -1:
             
