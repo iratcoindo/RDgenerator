@@ -26,6 +26,8 @@ if st.button("🔍 Search Papers"):
         if k.strip()
     ]
 
+    query = " ".join(keywords)
+
     if len(keywords) == 0:
         st.warning("Please enter at least one keyword.")
         st.stop()
@@ -34,17 +36,16 @@ if st.button("🔍 Search Papers"):
 
     progress = st.progress(0)
 
-    for i, kw in enumerate(keywords):
-
-        progress.progress(
-            (i + 1) / len(keywords)
-        )
-
+    query = " ".join(keywords)
+        
         url = (
             "https://api.openalex.org/works"
-            f"?search={kw}"
+            f"?search={query}"
             "&per-page=200"
         )
+
+        r = requests.get(url, timeout=30)
+        data = r.json()
 
         try:
             r = requests.get(url, timeout=30)
