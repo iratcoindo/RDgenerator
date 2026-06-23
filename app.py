@@ -47,103 +47,103 @@ if st.button("🔍 Search Papers"):
     r = requests.get(url, timeout=30)
     data = r.json()
 
-        try:
-            r = requests.get(url, timeout=30)
-            data = r.json()
+    try:
+        r = requests.get(url, timeout=30)
+        data = r.json()
 
-            for paper in data["results"]:
+        for paper in data["results"]:
 
-                title = paper.get(
-                    "display_name",
-                    ""
-                )
-
-                doi = paper.get(
-                    "doi",
-                    ""
-                )
-
-                publisher = ""
-
-                if (
-                    "primary_location"
-                    in paper
-                    and paper["primary_location"]
-                ):
-
-                    source = (
-                        paper["primary_location"]
-                        .get("source")
-                    )
-
-                    if source:
-                        publisher = source.get(
-                            "display_name",
-                            ""
-                        )
-
-                pdf_link = ""
-
-                if (
-                    "open_access"
-                    in paper
-                    and paper["open_access"]
-                ):
-                    pdf_link = (
-                        paper["open_access"]
-                        .get("oa_url", "")
-                    )
-
-                if pdf_link is None:
-                    pdf_link = ""
-
-                all_papers.append(
-                    {
-                        "Keyword": kw,
-                        "Title": title,
-                        "Publisher": publisher,
-                        "DOI": doi,
-                        "Download": pdf_link
-                    }
-                )
-
-        except Exception as e:
-            st.error(
-                f"Error searching '{kw}': {e}"
+            title = paper.get(
+                "display_name",
+                ""
             )
 
-    df = pd.DataFrame(
-        all_papers
+            doi = paper.get(
+                "doi",
+                ""
+            )
+
+            publisher = ""
+
+            if (
+                "primary_location"
+                in paper
+                and paper["primary_location"]
+            ):
+
+                source = (
+                    paper["primary_location"]
+                    .get("source")
+                )
+
+                if source:
+                    publisher = source.get(
+                        "display_name",
+                        ""
+                    )
+
+            pdf_link = ""
+
+            if (
+                "open_access"
+                in paper
+                and paper["open_access"]
+            ):
+                pdf_link = (
+                    paper["open_access"]
+                    .get("oa_url", "")
+                )
+
+            if pdf_link is None:
+                pdf_link = ""
+
+            all_papers.append(
+                {
+                    "Keyword": kw,
+                    "Title": title,
+                    "Publisher": publisher,
+                    "DOI": doi,
+                    "Download": pdf_link
+                }
+            )
+
+    except Exception as e:
+        st.error(
+            f"Error searching '{kw}': {e}"
+        )
+
+df = pd.DataFrame(
+    all_papers
+)
+
+if len(df) > 0:
+
+    df = df.drop_duplicates(
+        subset=["DOI"]
     )
 
-    if len(df) > 0:
+    st.success(
+        f"{len(df)} papers found."
+    )
 
-        df = df.drop_duplicates(
-            subset=["DOI"]
-        )
+    st.dataframe(
+        df,
+        use_container_width=True,
+        hide_index=True
+    )
 
-        st.success(
-            f"{len(df)} papers found."
-        )
+    csv = df.to_csv(
+        index=False
+    ).encode("utf-8")
 
-        st.dataframe(
-            df,
-            use_container_width=True,
-            hide_index=True
-        )
+    st.download_button(
+        "📥 Download CSV",
+        csv,
+        file_name="journal_miner.csv",
+        mime="text/csv"
+    )
 
-        csv = df.to_csv(
-            index=False
-        ).encode("utf-8")
-
-        st.download_button(
-            "📥 Download CSV",
-            csv,
-            file_name="journal_miner.csv",
-            mime="text/csv"
-        )
-
-    else:
-        st.warning(
-            "No papers found."
-        )
+else:
+    st.warning(
+        "No papers found."
+    )
