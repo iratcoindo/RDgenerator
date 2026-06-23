@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import requests
+import fitz
+import io
 
 st.header("📚 iRATco Journal Miner")
 
@@ -160,6 +162,213 @@ if st.button("🔍 Search Papers"):
                     use_container_width=True,
                     hide_index=True
                 )
+                # =======
+                st.subheader("Method Extraction")
+
+                paper_idx = st.selectbox(
+                    "Select Paper",
+                    df.index,
+                    format_func=lambda x:
+                        df.loc[x, "Title"]
+                )
+                
+                if st.button("Extract Methods"):
+                
+                    pdf_url = df.loc[
+                        paper_idx,
+                        "Download"
+                    ]
+                
+                    if pdf_url == "":
+                        st.error(
+                            "No PDF link available."
+                        )
+                        st.stop()
+                
+                    try:
+                
+                        with st.spinner(
+                            "Downloading PDF..."
+                        ):
+                
+                            r = requests.get(
+                                pdf_url,
+                                timeout=60
+                            )
+                
+                            pdf = fitz.open(
+                                stream=r.content,
+                                filetype="pdf"
+                            )
+                
+                            full_text = ""
+                
+                            for page in pdf:
+                                full_text += (
+                                    page.get_text()
+                                    + "\n"
+                                )
+                
+                        st.success(
+                            "PDF downloaded."
+                        )
+                
+                        st.session_state[
+                            "paper_text"
+                        ] = full_text
+                
+                    except Exception as e:
+                        st.error(e)
+
+                if "paper_text" in st.session_state:
+
+                text = st.session_state[
+                    "paper_text"
+                ]
+            
+                lower = text.lower()
+            
+                headers = [
+                    "materials and methods",
+                    "materials & methods",
+                    "methods",
+                    "methodology",
+                    "experimental design",
+                    "animal experiments"
+                ]
+            
+                start = -1
+            
+                for h in headers:
+            
+                    pos = lower.find(h)
+            
+                    if pos != -1:
+                        start = pos
+                        break
+            
+                if start != -1:
+            
+                    end = len(text)
+            
+                    next_headers = [
+                        "results",
+                        "discussion",
+                        "conclusion",
+                        "references"
+                    ]
+            
+                    for h in next_headers:
+            
+                        pos = lower.find(
+                            h,
+                            start + 100
+                        )
+            
+                        if (
+                            pos != -1
+                            and
+                            pos < end
+                        ):
+                            end = pos
+            
+                    methods_text = text[
+                        start:end
+                    ]
+            
+                    st.subheader(
+                        "Methods Section"
+                    )
+            
+                    st.text_area(
+                        "",
+                        methods_text,
+                        height=500
+                    )
+            
+                    st.session_state[
+                        "methods_text"
+                    ] = methods_text
+                if "methods_text" in st.session_state:
+
+                methods = st.session_state[
+                    "methods_text"
+                ]
+            
+                info = []
+            
+                keywords = {
+                    "Species":[
+                        "rat",
+                        "mouse",
+                        "rabbit",
+                        "guinea pig",
+                        "macaque"
+                    ],
+            
+                    "Strain":[
+                        "sprague dawley",
+                        "wistar",
+                        "c57bl/6",
+                        "balb/c"
+                    ],
+            
+                    "Histology":[
+                        "hematoxylin",
+                        "eosin",
+                        "masson",
+                        "pas"
+                    ],
+            
+                    "Methods":[
+                        "elisa",
+                        "western blot",
+                        "qpcr",
+                        "immunohistochemistry",
+                        "immunofluorescence",
+                        "flow cytometry"
+                    ]
+                }
+            
+                lower = methods.lower()
+            
+                for cat, words in keywords.items():
+            
+                    found = []
+            
+                    for w in words:
+            
+                        if w in lower:
+                            found.append(w)
+            
+                    info.append(
+                        {
+                            "Category": cat,
+                            "Information":
+                            ", ".join(found)
+                        }
+                    )
+            
+                result_df = pd.DataFrame(
+                    info
+                )
+            
+                st.subheader(
+                    "Experimental Information"
+                )
+            
+                st.dataframe(
+                    result_df,
+                    use_container_width=True,
+                    hide_index=True
+                )
+                else:
+            
+                    st.warning(
+                        "Methods section not found."
+                    )
+
+                # =======
 
                 csv = df.to_csv(
                     index=False
