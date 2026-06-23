@@ -37,15 +37,15 @@ if st.button("🔍 Search Papers"):
     progress = st.progress(0)
 
     query = " ".join(keywords)
-        
-        url = (
-            "https://api.openalex.org/works"
-            f"?search={query}"
-            "&per-page=200"
-        )
 
-        r = requests.get(url, timeout=30)
-        data = r.json()
+    url = (
+        "https://api.openalex.org/works"
+        f"?search={query}"
+        "&per-page=200"
+    )
+    
+    r = requests.get(url, timeout=30)
+    data = r.json()
 
         try:
             r = requests.get(url, timeout=30)
