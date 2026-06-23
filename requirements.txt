@@ -1,10 +1,12 @@
 streamlit
-requests
 pandas
 numpy
-networkx
+requests
 matplotlib
+seaborn
 plotly
+networkx
 wordcloud
-python-louvain
-scikit-learn
+rapidfuzz
+PyMuPDF
+openpyxl
