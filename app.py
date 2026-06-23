@@ -222,22 +222,22 @@ if st.button("🔍 Search Papers"):
 
                 if "paper_text" in st.session_state:
 
-                text = st.session_state[
-                    "paper_text"
-                ]
-            
-                lower = text.lower()
-            
-                headers = [
-                    "materials and methods",
-                    "materials & methods",
-                    "methods",
-                    "methodology",
-                    "experimental design",
-                    "animal experiments"
-                ]
-            
-                start = -1
+                    text = st.session_state[
+                        "paper_text"
+                    ]
+                
+                    lower = text.lower()
+                
+                    headers = [
+                        "materials and methods",
+                        "materials & methods",
+                        "methods",
+                        "methodology",
+                        "experimental design",
+                        "animal experiments"
+                    ]
+                
+                    start = -1
             
                 for h in headers:
             
