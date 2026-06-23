@@ -1,15 +1,6 @@
 import streamlit as st
 import pandas as pd
 import requests
-import numpy as np
-from io import BytesIO
-import time
-import re
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-import plotly.express as px
-import plotly.graph_objects as go
 
 st.header("📚 iRATco Journal Miner")
 
@@ -27,12 +18,8 @@ if st.button("🔍 Search Papers"):
     ]
 
     if len(keywords) == 0:
-        st.warning(
-            "Please enter keywords."
-        )
+        st.warning("Please enter at least one keyword.")
         st.stop()
-
-    all_papers = []
 
     query = " ".join(keywords)
 
@@ -42,109 +29,150 @@ if st.button("🔍 Search Papers"):
         "&per-page=200"
     )
 
-    r = requests.get(
-        url,
-        timeout=30
-    )
-
-    data = r.json()
     try:
-        r = requests.get(url, timeout=30)
-        data = r.json()
 
-        for paper in data["results"]:
+        with st.spinner("Searching papers..."):
 
-            title = paper.get(
-                "display_name",
-                ""
+            r = requests.get(
+                url,
+                timeout=30
             )
 
-            doi = paper.get(
-                "doi",
-                ""
-            )
+            data = r.json()
 
-            publisher = ""
+            all_papers = []
 
-            if (
-                "primary_location"
-                in paper
-                and paper["primary_location"]
-            ):
+            keywords_lower = [
+                k.lower()
+                for k in keywords
+            ]
 
-                source = (
-                    paper["primary_location"]
-                    .get("source")
+            for paper in data.get("results", []):
+
+                title = paper.get(
+                    "display_name",
+                    ""
                 )
 
-                if source:
-                    publisher = source.get(
-                        "display_name",
+                # reconstruct abstract
+                abstract = ""
+
+                if paper.get(
+                    "abstract_inverted_index"
+                ):
+
+                    inv = paper[
+                        "abstract_inverted_index"
+                    ]
+
+                    positions = {}
+
+                    for word, inds in inv.items():
+                        for i in inds:
+                            positions[i] = word
+
+                    abstract = " ".join(
+                        positions[i]
+                        for i in sorted(
+                            positions.keys()
+                        )
+                    )
+
+                text = (
+                    title + " " + abstract
+                ).lower()
+
+                # semua keyword harus ada
+                if not all(
+                    kw in text
+                    for kw in keywords_lower
+                ):
+                    continue
+
+                doi = paper.get(
+                    "doi",
+                    ""
+                )
+
+                publisher = ""
+
+                primary = paper.get(
+                    "primary_location"
+                )
+
+                if primary:
+
+                    source = primary.get(
+                        "source"
+                    )
+
+                    if source:
+                        publisher = source.get(
+                            "display_name",
+                            ""
+                        )
+
+                pdf_link = ""
+
+                open_access = paper.get(
+                    "open_access"
+                )
+
+                if open_access:
+                    pdf_link = open_access.get(
+                        "oa_url",
                         ""
                     )
 
-            pdf_link = ""
+                if pdf_link is None:
+                    pdf_link = ""
 
-            if (
-                "open_access"
-                in paper
-                and paper["open_access"]
-            ):
-                pdf_link = (
-                    paper["open_access"]
-                    .get("oa_url", "")
+                all_papers.append(
+                    {
+                        "Title": title,
+                        "Publisher": publisher,
+                        "DOI": doi,
+                        "Download": pdf_link
+                    }
                 )
 
-            if pdf_link is None:
-                pdf_link = ""
-
-            all_papers.append(
-                {
-                    "Keyword": kw,
-                    "Title": title,
-                    "Publisher": publisher,
-                    "DOI": doi,
-                    "Download": pdf_link
-                }
+            df = pd.DataFrame(
+                all_papers
             )
+
+            if len(df) == 0:
+                st.warning(
+                    "No papers found."
+                )
+
+            else:
+
+                df = df.drop_duplicates(
+                    subset=["DOI"]
+                )
+
+                st.success(
+                    f"{len(df)} papers found."
+                )
+
+                st.dataframe(
+                    df,
+                    use_container_width=True,
+                    hide_index=True
+                )
+
+                csv = df.to_csv(
+                    index=False
+                ).encode("utf-8")
+
+                st.download_button(
+                    "📥 Download CSV",
+                    csv,
+                    file_name="journal_miner.csv",
+                    mime="text/csv"
+                )
 
     except Exception as e:
         st.error(
-            f"Error searching '{kw}': {e}"
+            f"Error: {e}"
         )
-
-df = pd.DataFrame(
-    all_papers
-)
-
-if len(df) > 0:
-
-    df = df.drop_duplicates(
-        subset=["DOI"]
-    )
-
-    st.success(
-        f"{len(df)} papers found."
-    )
-
-    st.dataframe(
-        df,
-        use_container_width=True,
-        hide_index=True
-    )
-
-    csv = df.to_csv(
-        index=False
-    ).encode("utf-8")
-
-    st.download_button(
-        "📥 Download CSV",
-        csv,
-        file_name="journal_miner.csv",
-        mime="text/csv"
-    )
-
-else:
-    st.warning(
-        "No papers found."
-    )
