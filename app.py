@@ -291,77 +291,77 @@ if st.button("🔍 Search Papers"):
                     ] = methods_text
                 if "methods_text" in st.session_state:
 
-                methods = st.session_state[
-                    "methods_text"
-                ]
-            
-                info = []
-            
-                keywords = {
-                    "Species":[
-                        "rat",
-                        "mouse",
-                        "rabbit",
-                        "guinea pig",
-                        "macaque"
-                    ],
-            
-                    "Strain":[
-                        "sprague dawley",
-                        "wistar",
-                        "c57bl/6",
-                        "balb/c"
-                    ],
-            
-                    "Histology":[
-                        "hematoxylin",
-                        "eosin",
-                        "masson",
-                        "pas"
-                    ],
-            
-                    "Methods":[
-                        "elisa",
-                        "western blot",
-                        "qpcr",
-                        "immunohistochemistry",
-                        "immunofluorescence",
-                        "flow cytometry"
+                    methods = st.session_state[
+                        "methods_text"
                     ]
-                }
-            
-                lower = methods.lower()
-            
-                for cat, words in keywords.items():
-            
-                    found = []
-            
-                    for w in words:
-            
-                        if w in lower:
-                            found.append(w)
-            
-                    info.append(
-                        {
-                            "Category": cat,
-                            "Information":
-                            ", ".join(found)
-                        }
+                
+                    info = []
+                
+                    keywords = {
+                        "Species":[
+                            "rat",
+                            "mouse",
+                            "rabbit",
+                            "guinea pig",
+                            "macaque"
+                        ],
+                
+                        "Strain":[
+                            "sprague dawley",
+                            "wistar",
+                            "c57bl/6",
+                            "balb/c"
+                        ],
+                
+                        "Histology":[
+                            "hematoxylin",
+                            "eosin",
+                            "masson",
+                            "pas"
+                        ],
+                
+                        "Methods":[
+                            "elisa",
+                            "western blot",
+                            "qpcr",
+                            "immunohistochemistry",
+                            "immunofluorescence",
+                            "flow cytometry"
+                        ]
+                    }
+                
+                    lower = methods.lower()
+                
+                    for cat, words in keywords.items():
+                
+                        found = []
+                
+                        for w in words:
+                
+                            if w in lower:
+                                found.append(w)
+                
+                        info.append(
+                            {
+                                "Category": cat,
+                                "Information":
+                                ", ".join(found)
+                            }
+                        )
+                
+                    result_df = pd.DataFrame(
+                        info
                     )
-            
-                result_df = pd.DataFrame(
-                    info
-                )
-            
-                st.subheader(
-                    "Experimental Information"
-                )
-            
-                st.dataframe(
-                    result_df,
-                    use_container_width=True,
-                    hide_index=True
-                )
+                
+                    st.subheader(
+                        "Experimental Information"
+                    )
+                
+                    st.dataframe(
+                        result_df,
+                        use_container_width=True,
+                        hide_index=True
+                    )
                 else:
             
                     st.warning(
