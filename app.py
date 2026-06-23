@@ -28,11 +28,6 @@ if st.button(
         if k.strip()
     ]
 
-    st.write(
-        "Keywords:"
-    )
-
-    st.write(keywords)
 for kw in keywords:
 
     url = (
