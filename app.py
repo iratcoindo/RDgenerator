@@ -222,7 +222,6 @@ if st.button("🔍 Search Papers"):
                 if "paper_text" in st.session_state:
 
                     text = st.session_state["paper_text"]
-                
                     lower = text.lower()
                 
                     headers = [
@@ -231,15 +230,18 @@ if st.button("🔍 Search Papers"):
                         "methods",
                         "methodology",
                         "experimental design",
-                        "animal experiments"
+                        "experimental procedures",
+                        "experimental protocol",
+                        "experimental animals",
+                        "animals and treatments",
+                        "study design",
+                        "materials"
                     ]
                 
                     start = -1
                 
                     for h in headers:
-                
                         pos = lower.find(h)
-                
                         if pos != -1:
                             start = pos
                             break
@@ -252,7 +254,8 @@ if st.button("🔍 Search Papers"):
                             "results",
                             "discussion",
                             "conclusion",
-                            "references"
+                            "references",
+                            "acknowledgements"
                         ]
                 
                         for h in next_headers:
@@ -267,6 +270,10 @@ if st.button("🔍 Search Papers"):
                 
                         methods_text = text[start:end]
                 
+                        st.session_state[
+                            "methods_text"
+                        ] = methods_text
+                
                         st.subheader(
                             "Methods Section"
                         )
@@ -277,83 +284,91 @@ if st.button("🔍 Search Papers"):
                             height=500
                         )
                 
-                        st.session_state[
-                            "methods_text"
-                        ] = methods_text
+                if "methods_text" in st.session_state:
                 
-                        info = []
-                    
-                        keywords = {
-                            "Species":[
-                                "rat",
-                                "mouse",
-                                "rabbit",
-                                "guinea pig",
-                                "macaque"
-                            ],
-                    
-                            "Strain":[
-                                "sprague dawley",
-                                "wistar",
-                                "c57bl/6",
-                                "balb/c"
-                            ],
-                    
-                            "Histology":[
-                                "hematoxylin",
-                                "eosin",
-                                "masson",
-                                "pas"
-                            ],
-                    
-                            "Methods":[
-                                "elisa",
-                                "western blot",
-                                "qpcr",
-                                "immunohistochemistry",
-                                "immunofluorescence",
-                                "flow cytometry"
-                            ]
-                        }
-                    
-                        lower = methods.lower()
-                    
-                        for cat, words in keywords.items():
-                    
-                            found = []
-                    
-                            for w in words:
-                    
-                                if w in lower:
-                                    found.append(w)
-                    
-                            info.append(
-                                {
-                                    "Category": cat,
-                                    "Information":
+                    methods_text = st.session_state[
+                        "methods_text"
+                    ]
+                
+                    method_keywords = {
+                        "Species": [
+                            "rat",
+                            "mouse",
+                            "mice",
+                            "rabbit",
+                            "guinea pig",
+                            "macaque",
+                            "dog",
+                            "pig"
+                        ],
+                
+                        "Strain": [
+                            "sprague dawley",
+                            "wistar",
+                            "c57bl/6",
+                            "balb/c",
+                            "icr",
+                            "ddY"
+                        ],
+                
+                        "Histology": [
+                            "hematoxylin",
+                            "eosin",
+                            "masson",
+                            "pas",
+                            "toluidine blue",
+                            "safranin o"
+                        ],
+                
+                        "Methods": [
+                            "elisa",
+                            "western blot",
+                            "qpcr",
+                            "rt-pcr",
+                            "immunohistochemistry",
+                            "immunofluorescence",
+                            "flow cytometry",
+                            "micro ct",
+                            "micro-computed tomography"
+                        ]
+                    }
+                
+                    lower = methods_text.lower()
+                
+                    info = []
+                
+                    for cat, words in method_keywords.items():
+                
+                        found = []
+                
+                        for w in words:
+                
+                            if w in lower:
+                                found.append(w)
+                
+                        info.append(
+                            {
+                                "Category": cat,
+                                "Information":
                                     ", ".join(found)
-                                }
-                            )
-                    
-                        result_df = pd.DataFrame(
-                            info
+                                    if len(found) > 0
+                                    else "-"
+                            }
                         )
-                    
-                        st.subheader(
-                            "Experimental Information"
-                        )
-                    
-                        st.dataframe(
-                            result_df,
-                            use_container_width=True,
-                            hide_index=True
-                        )
-                else:
-            
-                    st.warning(
-                        "Methods section not found."
+                
+                    result_df = pd.DataFrame(
+                        info
                     )
-
+                
+                    st.subheader(
+                        "Experimental Information"
+                    )
+                
+                    st.dataframe(
+                        result_df,
+                        use_container_width=True,
+                        hide_index=True
+                    )
                 # =======
 
                 csv = df.to_csv(
